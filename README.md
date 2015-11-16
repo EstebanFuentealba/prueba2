@@ -16,6 +16,10 @@ empaquetar JS
 ```bash
 npm run build
 ```
+correr mongod
+```bash
+sudo mongod
+```
 correr servidor
 ```bash
 npm run start

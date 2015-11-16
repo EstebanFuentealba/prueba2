@@ -79,11 +79,11 @@ class DetailUser extends React.Component {
               <tbody>
                 <tr>
                   <td>Email:</td>
-                  <td><i class="icon-home"></i> {this.state.user.email}</td>
+                  <td>{this.state.user.email}</td>
                 </tr>
                 <tr>
                   <td>Fecha de Nacimiento:</td>
-                  <td><i class="icon-home"></i> {day}</td>
+                  <td>{day}</td>
                 </tr>
               </tbody>
             </Table>
