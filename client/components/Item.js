@@ -1,6 +1,5 @@
 import React from 'react';
 import {Link} from 'react-router';
-import appActions from './../actions';
 import moment from 'moment';
 
 class Item extends React.Component {
@@ -17,20 +16,14 @@ class Item extends React.Component {
         <td>{this.props.user.lastName}</td>
         <td>{this.props.user.email}</td>
         <td>{day}</td>
-        <td><Link to={detalleURL}>Detalle</Link></td>
-        <td><Link to={editarURL}>Editar</Link></td>
-        <td><a onClick={this.confirmDelete.bind(this)}>Eliminar</a></td>
+        <td><Link to={detalleURL} className="btn btn-default">Detalle</Link></td>
+        <td><Link to={editarURL} className="btn btn-default">Editar</Link></td>
+        <td><a className="btn btn-danger" onClick={this.confirmDelete.bind(this)}>Eliminar</a></td>
       </tr>
     );
   }
   confirmDelete() {
-    var me = this;
-    appActions.deleteUser(this.props.user._id, (err, res) => {
-      if (err) {
-        res.status(500).json(err);
-      }
-      me.props.refresh();
-    });
+    this.props.openModal(this.props.user._id);
   }
 }
 module.exports = Item;

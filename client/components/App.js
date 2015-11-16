@@ -5,7 +5,7 @@ import ListUser from './ListUser';
 import CreateUser from './CreateUser';
 import appActions from './../actions';
 import userStore from './../stores/userStore';
-
+import { Row, Panel } from 'react-bootstrap';
 
 class App extends React.Component {
   constructor(props) {
@@ -15,18 +15,18 @@ class App extends React.Component {
     };
   }
   componentDidMount() {
-
     this.listenTo(userStore, function(data) {
       console.log(data);
     });
     this.refreshData();
-
   }
   render() {
-    return (<div className="small-12 columns">
-      <ListUser users={this.state.users} refresh={this.refreshData.bind(this)} />
-      <CreateUser onClick={this.saveUser.bind(this)}/>
-    </div>);
+    return (<Panel>
+      <Row>
+        <ListUser users={this.state.users} refresh={this.refreshData.bind(this)} />
+        <CreateUser onClick={this.saveUser.bind(this)}/>
+      </Row>
+    </Panel>);
   }
   refreshData() {
     var me = this;

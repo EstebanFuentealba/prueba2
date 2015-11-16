@@ -3,7 +3,7 @@ var express = require('express');
 var busboy = require("connect-busboy");
 var fs = require('fs');
 var path = require('path');
-// var sizeOf = require('image-size');
+var lwip = require('lwip');
 var mongoose = require('mongoose');
 
 var router = express.Router();
@@ -37,20 +37,43 @@ router.post("/upload/:id", function(req, res){
           var URL = '/files/' + fileNameGenerated;
 
           file.pipe(fs.createWriteStream(pathFileName));
-          user.images.push({
-            _id: id,
-            path: pathFileName,
-            URL:URL
-          })
-          user.save(function(err, user) {
-            if (err) {
-              res.send(err);
-            }
+
+
+          lwip.open(pathFileName, function(err, img) {
+            if (err) return console.log(err);
+            var width = 200;
+            var height = 200;
+            var widthRatio =  width / img.width();
+            var heightRatio = height / img.height();
+            var ratio = Math.min(widthRatio, heightRatio);
+
+            img.batch()
+            .scale(ratio)
+              .writeFile(pathFileName, function(err) {
+                if (err) return console.log(err);
+                console.log('done');
+              });
           });
-          files_upload.push({
-            file: fieldName,
-            success: true
+
+          let existsImage = user.images.filter((image) => {
+            return (image._id == id);
           });
+          if(existsImage.length === 0) {
+            user.images.push({
+              _id: id,
+              path: pathFileName,
+              URL:URL
+            });
+            user.save(function(err, user) {
+              if (err) {
+                res.send(err);
+              }
+            });
+            files_upload.push({
+              file: fieldName,
+              success: true
+            });
+          }
         } else {
           files_upload.push({
             file: fieldName,
@@ -61,7 +84,7 @@ router.post("/upload/:id", function(req, res){
     	});
       req.busboy.on('finish', function() {
         res.json({
-          sucess: true,
+          success: true,
           items: files_upload
         });
       });

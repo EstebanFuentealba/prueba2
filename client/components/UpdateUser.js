@@ -3,6 +3,7 @@ import Validation from 'react-validation';
 import validator from'validator';
 import appActions from './../actions';
 import moment from 'moment';
+import { Row, Col, Panel } from 'react-bootstrap';
 
 Validation.extendErrors({
   isRequired: {
@@ -38,6 +39,7 @@ class UpdateUser extends React.Component {
       if (err) {
         res.status(500).json(err);
       }
+      console.log(res);
     });
   }
   getFormData() {
@@ -51,89 +53,91 @@ class UpdateUser extends React.Component {
     return item;
   }
   render() {
-    return (<Validation.Form id="form" ref="formUser" method="POST" className="small-12 large-4 columns" onSubmit={this.onSubmit.bind(this)}>
-      <div className="row">
-        <div className="name-field small-12 columns">
-          <label>Nombre <small>requerido</small>
-            <Validation.Input
-                        blocking="input"
-                        className="ui-input"
-                        validations={[
-                          {
-                              rule: 'isRequired'
-                          }
-                        ]}
-                        invalidClassName="error"
-                        name="name"
-                        ref="name"
-                        type="text"
-                        />
-          </label>
-        </div>
-      </div>
-      <div className="row">
-        <div className="name-field small-12 columns">
-          <label>Apellido <small>requerido</small>
-            <Validation.Input
-                        blocking="input"
-                        className="ui-input"
-                        validations={[
-                          {
-                              rule: 'isRequired'
-                          }
-                        ]}
-                        invalidClassName="error"
-                        name="lastName"
-                        ref="lastName"
-                        type="text"/>
-          </label>
-        </div>
-      </div>
-      <div className="row">
-        <div className="name-field small-12 columns">
-          <label>Email <small>requerido</small>
-            <Validation.Input
-                        blocking="input"
-                        className="ui-input"
-                        validations={[
-                          {
-                              rule: 'isRequired'
-                          },
-                          {
-                              rule: 'isEmail'
-                          }
-                        ]}
-                        invalidClassName="error"
-                        name="email"
-                        ref="email"
-                        type="text"/>
-          </label>
-        </div>
-      </div>
-      <div className="row">
-        <div className="name-field small-12 columns">
-          <label>Fecha de Nacimiento <small>requerido</small>
-            <Validation.Input
-                        blocking="input"
-                        className="ui-input"
-                        validations={[
-                          {
-                              rule: 'isRequired'
-                          }
-                        ]}
-                        invalidClassName="error"
-                        name="birthOfdate"
-                        ref="birthOfdate"
-                        type="date"/>
-          </label>
-        </div>
-      </div>
-      <div className="row">
-        <div className="small-12 columns">
-          <Validation.Button blocking="button" className="button" value="Guardar"/>
-        </div>
-      </div>
-    </Validation.Form>);
+    return (<Panel>
+      <Row>
+        <Col sm={12} md={12}>
+          <Validation.Form id="form" ref="formUser" method="POST" onSubmit={this.onSubmit.bind(this)}>
+            <div className="form-group">
+              <label for="name">Nombre <small>requerido</small></label>
+                <Validation.Input
+                            blocking="input"
+                            className="form-control"
+                            validations={[
+                              {
+                                  rule: 'isRequired'
+                              }
+                            ]}
+                            id="name"
+                            invalidClassName="error"
+                            name="name"
+                            ref="name"
+                            type="text"
+                            placeholder="Nombre"
+                            />
+            </div>
+
+            <div className="form-group">
+              <label for="lastName">Apellido <small>requerido</small></label>
+                <Validation.Input
+                            blocking="input"
+                            className="form-control"
+                            validations={[
+                              {
+                                  rule: 'isRequired'
+                              }
+                            ]}
+                            id="lastName"
+                            invalidClassName="error"
+                            name="lastName"
+                            ref="lastName"
+                            type="text"
+                            placeholder="Apellido"
+                            />
+            </div>
+            <div className="form-group">
+              <label for="email">Email <small>requerido</small></label>
+                <Validation.Input
+                            blocking="input"
+                            className="form-control"
+                            validations={[
+                              {
+                                  rule: 'isRequired'
+                              },
+                              {
+                                  rule: 'isEmail'
+                              }
+                            ]}
+                            id="email"
+                            invalidClassName="error"
+                            name="email"
+                            ref="email"
+                            type="text"
+                            placeholder="Email"
+                            />
+            </div>
+            <div className="form-group">
+              <label for="birthOfdate">Fecha de Nacimiento <small>requerido</small></label>
+                <Validation.Input
+                            blocking="input"
+                            className="form-control"
+                            validations={[
+                              {
+                                  rule: 'isRequired'
+                              }
+                            ]}
+                            id="birthOfdate"
+                            invalidClassName="error"
+                            name="birthOfdate"
+                            ref="birthOfdate"
+                            type="date"
+                            placeholder="Fecha de Nacimiento"
+                            />
+            </div>
+            <Validation.Button blocking="button" className="btn btn-primary" value="Guardar"/>
+          </Validation.Form>
+        </Col>
+      </Row>
+    </Panel>);
   }
 
   clean() {

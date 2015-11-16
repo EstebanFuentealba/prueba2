@@ -41,7 +41,3 @@ elimina  un usuario
 ```bash
 DELETE /api/:id
 ```
-
-### TODO
-- redimensionar imágenes A 200x200px
-- dar diseño a vistas
