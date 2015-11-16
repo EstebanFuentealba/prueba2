@@ -28,7 +28,8 @@ router.post("/upload/:id", function(req, res){
       req.pipe(req.busboy);
       var files_upload = [];
     	req.busboy.on("file", function(fieldName, file, filename, encoding, mimetype) {
-        var isImage = /image\/(jpeg|jpg|gif|png)$/i.test(mimetype);
+        // var isImage = /image\/(jpeg|jpg|gif|png)$/i.test(mimetype);
+        var isImage = /image\/(jpeg|jpg)$/i.test(mimetype);
         if(isImage){
           var id = mongoose.Types.ObjectId();
           var extension = path.extname(fieldName);
@@ -77,8 +78,12 @@ router.post("/upload/:id", function(req, res){
         } else {
           files_upload.push({
             file: fieldName,
-            msg: 'solo formato de imágenes',
+            msg: 'permitido sólo formato JPG',
             success: false
+          });
+          res.json({
+            success: false,
+            items: files_upload
           });
         }
     	});
