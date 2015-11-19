@@ -2,6 +2,7 @@ var mongoose = require('mongoose');
 var bcrypt = require('bcrypt');
 var SALT_WORK_FACTOR = 10;
 var Schema  = mongoose.Schema;
+
 var UserSchema   = new Schema({
     name: String,
     lastName: String,
@@ -17,6 +18,7 @@ var UserSchema   = new Schema({
         social: String
     }]
 });
+
 UserSchema.pre('save', function(next) {
     var user = this;
     if (!user.isModified('password')) return next();
@@ -29,15 +31,18 @@ UserSchema.pre('save', function(next) {
         });
     });
 });
+
 UserSchema.methods.comparePassword = function(candidatePassword, cb) {
     bcrypt.compare(candidatePassword, this.password, function(err, isMatch) {
         if (err) return cb(err);
         cb(null, isMatch);
     });
 };
+
 UserSchema.methods.toJSON = function() {
   var obj = this.toObject();
   delete obj.password;
   return obj;
 }
+
 module.exports = mongoose.model('User', UserSchema);

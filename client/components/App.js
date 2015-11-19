@@ -1,11 +1,7 @@
 import React from 'react';
-import Reflux from 'reflux';
 import reactMixin from 'react-mixin';
-import ListUser from './ListUser';
-import CreateUser from './CreateUser';
-import appActions from './../actions';
-import userStore from './../stores/userStore';
-import { Row, Panel } from 'react-bootstrap';
+import { Col, Row, Panel, ListGroup, ListGroupItem } from 'react-bootstrap';
+import { Link } from 'react-router';
 
 class App extends React.Component {
   constructor(props) {
@@ -14,43 +10,24 @@ class App extends React.Component {
       users: []
     };
   }
-  componentDidMount() {
-    this.listenTo(userStore, function(data) {
-      console.log(data);
-    });
-    this.refreshData();
-  }
   render() {
-    return (<Panel>
-      <Row>
-        <ListUser users={this.state.users} refresh={this.refreshData.bind(this)} />
-        <CreateUser onClick={this.saveUser.bind(this)}/>
-      </Row>
-    </Panel>);
-  }
-  refreshData() {
-    var me = this;
-    appActions.getUsers(function(err, res) {
-      if (err) {
-        res.status(500).json(err);
-      }
-      me.setState({
-        users: res.body
-      });
-    });
-  }
-  saveUser(data) {
-    var me = this;
-    appActions.addUser(data, function(err, res) {
-      if (err) {
-        res.status(500).json(err);
-      }
-      me.state.users.push(res.body);
-      me.setState({
-        users: me.state.users
-      });
-    });
+    return (<Row>
+      <Col sm={12} md={2} lg={2}>
+        Menu
+        <ListGroup>
+          <ListGroupItem><Link to="/users" params={this.state.users} className="btn btn-default">Usuarios</Link></ListGroupItem>
+          <ListGroupItem><Link to="/users/new" className="btn btn-default">Nuevo</Link></ListGroupItem>
+        </ListGroup>
+      </Col>
+      <Col sm={12} md={10} lg={10}>
+        <Panel>
+          <Row>
+            {this.props.children}
+          </Row>
+        </Panel>
+      </Col>
+    </Row>);
   }
 }
-reactMixin(App.prototype, Reflux.ListenerMixin);
+reactMixin(App.prototype, History);
 module.exports = App;

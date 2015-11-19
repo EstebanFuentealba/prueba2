@@ -2,6 +2,7 @@ import React from 'react';
 import Item from './Item';
 import { Col, Table, Modal, Button } from 'react-bootstrap';
 import appActions from './../actions';
+import userStore from './../stores/userStore';
 
 class ListUser extends React.Component {
   constructor(props) {
@@ -24,18 +25,15 @@ class ListUser extends React.Component {
     });
   }
   confirmModal() {
-    var me = this;
-    appActions.deleteUser(this.state.id, (err, res) => {
-      if (err) {
-        res.status(500).json(err);
-      }
-      me.props.refresh();
-      me.closeModal();
+    userStore.deleteUser(this.state.id).then((userDeleted) => {
+      this.closeModal();
+    }).catch(function(error) {
+      console.log("ocurrio un error");
     });
   }
   render() {
     var me = this;
-    return (<Col sm={12} md={8}>
+    return (<Col sm={12} md={9} lg={9}>
         <Table responsive striped bordered condensed hover>
           <thead>
             <tr>

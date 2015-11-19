@@ -1,9 +1,11 @@
 import React from 'react';
-import appActions from './../actions';
 import Dropzone from 'react-dropzone';
-import request from 'superagent';
 import { Row, Col, Panel, Table, Thumbnail, Modal, Button } from 'react-bootstrap';
 import moment from 'moment';
+import appActions from './../actions';
+import userStore from './../stores/userStore';
+import reactMixin from 'react-mixin';
+import Reflux from 'reflux';
 
 class DetailUser extends React.Component {
   constructor(props) {
@@ -12,19 +14,15 @@ class DetailUser extends React.Component {
       user: null,
       showModal: false
     };
-
-    this.getUserInfo();
+    this.listenTo(userStore, this.userStoreListener);
   }
-  getUserInfo() {
-    var me = this;
-    appActions.getUser(this.props.params.id, (err, res) => {
-      if (err) {
-        res.status(500).json(err);
-      }
-      me.setState({
-        user: res.body
-      });
-    });
+  componentWillMount() {
+    appActions.getUser(this.props.params.id);
+  }
+  userStoreListener(users) {
+    if(users.length == 1) {
+      this.setState({ user: users[0] });
+    }
   }
   openModal() {
     this.setState({
@@ -40,23 +38,10 @@ class DetailUser extends React.Component {
     console.log(nextProps);
   }
   onDrop(files) {
-    var req = request.post('/upload/' + this.props.params.id);
-    files.forEach((file)=> {
-      //if (file.type === 'image/jpg') {
-      req.attach(file.name, file);
-      //}
-    });
-    req.end((err, res) => {
-      if (err){
-        console.log(err);
-      }
-      if (res.body.success){
-        // OK
-        this.getUserInfo();
-      } else {
-        // ERROR
-        this.openModal();
-      }
+    userStore.uploadFile(this.props.params.id, files).then((userUpdated) => {
+      appActions.getUser(this.props.params.id);
+    }).catch(function(error) {
+      console.log("ocurrio un error");
     });
   }
   render() {
@@ -71,7 +56,7 @@ class DetailUser extends React.Component {
         })}
       </Row>);
       let day = moment(this.state.user.birthOfdate).format('YYYY-MM-DD');
-      html = (<Panel>
+      html = (
         <Row>
           <Col sm={4} md={4} lg={4}>
             <h3>{this.state.user.name} {this.state.user.lastName}</h3>
@@ -94,19 +79,19 @@ class DetailUser extends React.Component {
             </Dropzone>
             {images}
           </Col>
+          <Modal show={this.state.showModal} onHide={this.closeModal.bind(this)}>
+            <Modal.Header closeButton>
+              <Modal.Title>Ocurrio un error</Modal.Title>
+            </Modal.Header>
+            <Modal.Body>
+              <p>Falló la subida de uno o más archivos</p>
+            </Modal.Body>
+            <Modal.Footer>
+              <Button bsStyle="primary" onClick={this.closeModal.bind(this)}>OK</Button>
+            </Modal.Footer>
+          </Modal>
         </Row>
-        <Modal show={this.state.showModal} onHide={this.closeModal.bind(this)}>
-          <Modal.Header closeButton>
-            <Modal.Title>Ocurrio un error</Modal.Title>
-          </Modal.Header>
-          <Modal.Body>
-            <p>Falló la subida de uno o más archivos</p>
-          </Modal.Body>
-          <Modal.Footer>
-            <Button bsStyle="primary" onClick={this.closeModal.bind(this)}>OK</Button>
-          </Modal.Footer>
-        </Modal>
-      </Panel>);
+        );
     } else {
       html = (<Panel>
         <Row>
@@ -117,4 +102,5 @@ class DetailUser extends React.Component {
     return html;
   }
 }
+reactMixin(DetailUser.prototype, Reflux.ListenerMixin);
 module.exports = DetailUser;

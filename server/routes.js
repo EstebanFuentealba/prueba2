@@ -9,12 +9,9 @@ var mongoose = require('mongoose');
 var router = express.Router();
 var User = require('./models/User');
 var _ = require('lodash');
-router.get('/', function indexRouteHandler (req, res) {
-  res.render('view', {
-  	title: "Prueba",
-    token: _.uniqueId()
-  });
-});
+
+
+
 router.use(busboy());
 router.post("/upload/:id", function(req, res){
   User.findById(req.params.id, function (err, user) {
@@ -119,11 +116,15 @@ router.post('/api', function(req, res) {
   });
 });
 router.put('/api/:id', function(req, res) {
+  console.log("REQUEST");
+  console.log(req);
   User.findById(req.params.id, function (err, user) {
     if (err) {
       res.send(err);
     } else {
+
       _.extend(user, req.body);
+      console.log(user);
       user.save(function(err, user) {
         if (err)
           res.send(err);

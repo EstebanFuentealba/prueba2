@@ -1,47 +1,26 @@
-'use strict';
-
-var express = require('express');
 var path = require('path');
-// var logger = require('morgan');
-var cookieParser = require('cookie-parser');
-var bodyParser = require('body-parser');
-var routes = require('./routes');
+var express = require('express');
+var webpack = require('webpack');
+var config = require('./webpack.config');
 var mongoose = require('mongoose');
+var routes = require('./routes');
+var bodyParser = require('body-parser');
+
 var app = express();
-
 app.set('port', (process.env.PORT || 5000));
+var compiler = webpack(config);
+app.use(require('webpack-dev-middleware')(compiler, {
+    noInfo: true,
+    publicPath: config.output.publicPath
+}));
 
-app.set('views', __dirname + '/');
-app.set('view engine', 'ejs');
-
-// app.use(logger('dev'));
 app.use(bodyParser.json());
-
-app.use(bodyParser.urlencoded({ extended: false }));
-app.use(cookieParser());
-
 app.use(express.static(path.join(__dirname, '../public')));
+app.use(require('webpack-hot-middleware')(compiler));
 app.use('/', routes);
-
-app.use(function(req, res, next){
-  res.status(404);
-
-  // respond with html page
-  if (req.accepts('html')) {
-    res.render('404', { url: req.url });
-    return;
-  }
-
-  // respond with json
-  if (req.accepts('json')) {
-    res.send({ error: 'Not found' });
-    return;
-  }
-
-  // default to plain-text. send()
-  res.type('txt').send('Not found');
+app.get('*', function (req, res) {
+  res.sendFile(path.join(__dirname, './../public/index.html'));
 });
-
 mongoose.connect('mongodb://localhost/prueba',  function(err) {
   if (err) throw err;
   // Start the server

@@ -1,9 +1,12 @@
 import React from 'react';
-import Validation from 'react-validation';
+import Validation,{Input} from 'react-validation';
 import validator from'validator';
 import appActions from './../actions';
+import userStore from './../stores/userStore';
 import moment from 'moment';
 import { Row, Col, Panel } from 'react-bootstrap';
+import reactMixin from 'react-mixin';
+import Reflux from 'reflux';
 
 Validation.extendErrors({
   isRequired: {
@@ -22,24 +25,29 @@ Validation.extendErrors({
 class UpdateUser extends React.Component {
   constructor(props) {
     super(props);
-    appActions.getUser(this.props.params.id, (err, res) => {
-      if (err) {
-        res.status(500).json(err);
-      }
-      this.refs.name.setValue(res.body.name);
-      this.refs.lastName.setValue(res.body.lastName);
-      this.refs.email.setValue(res.body.email);
-      var day = moment(res.body.birthOfdate).format('YYYY-MM-DD');
-      this.refs.birthOfdate.setValue(day);
-    });
+    this.state = {
+      user: {}
+    };
+    this.listenTo(userStore, this.userStoreListener);
+  }
+  userStoreListener(users) {
+    if(users.length == 1) {
+      this.setState({ user: users[0] });
+      this.refs.name.setValue(this.state.user.name);
+      this.refs.lastName.setValue(this.state.user.lastName);
+      this.refs.email.setValue(this.state.user.email);
+      this.refs.birthOfdate.setValue(moment(this.state.user.birthOfdate).format('YYYY-MM-DD'));
+    }
+  }
+  componentWillMount() {
+    appActions.getUser(this.props.params.id);
   }
   onSubmit(event) {
     event.preventDefault();
-    appActions.updateUser(this.props.params.id, this.getFormData(), function(err, res) {
-      if (err) {
-        res.status(500).json(err);
-      }
-      console.log(res);
+    userStore.updateUser(this.props.params.id, this.getFormData()).then((userUpdated) => {
+      this.props.history.pushState(null, "users");
+    }).catch(function(error) {
+      console.log("ocurrio un error");
     });
   }
   getFormData() {
@@ -59,7 +67,7 @@ class UpdateUser extends React.Component {
           <Validation.Form id="form" ref="formUser" method="POST" onSubmit={this.onSubmit.bind(this)}>
             <div className="form-group">
               <label for="name">Nombre <small>requerido</small></label>
-                <Validation.Input
+                <Input
                             blocking="input"
                             className="form-control"
                             validations={[
@@ -139,9 +147,7 @@ class UpdateUser extends React.Component {
       </Row>
     </Panel>);
   }
-
-  clean() {
-    this.refs.formUser.reset();
-  }
 }
+
+reactMixin(UpdateUser.prototype, Reflux.ListenerMixin);
 module.exports = UpdateUser;

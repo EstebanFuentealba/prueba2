@@ -2,6 +2,8 @@ import React from 'react';
 import Validation from 'react-validation';
 import validator from'validator';
 import { Row, Col } from 'react-bootstrap';
+import appActions from './../actions';
+import userStore from './../stores/userStore';
 
 Validation.extendErrors({
   isRequired: {
@@ -23,7 +25,11 @@ class CreateUser extends React.Component {
   }
   onSubmit(event) {
     event.preventDefault();
-    this.props.onClick(this.getFormData());
+    userStore.addUser(this.getFormData()).then((userAdded) => {
+      this.props.history.pushState(null, "users");
+    }).catch(function(error) {
+      console.log("ocurrio un error");
+    });
   }
   getFormData() {
     var form = document.querySelector('#form');
@@ -36,7 +42,7 @@ class CreateUser extends React.Component {
     return item;
   }
   render() {
-    return (<Col sm={12} md={4}>
+    return (<Col sm={12} md={3} lg={3}>
       <Validation.Form id="form" ref="formUser" method="POST" onSubmit={this.onSubmit.bind(this)}>
         <div className="form-group">
           <label for="name">Nombre <small>requerido</small></label>
@@ -136,10 +142,6 @@ class CreateUser extends React.Component {
         <Validation.Button blocking="button" className="btn btn-primary" value="Guardar"/>
       </Validation.Form>
     </Col>);
-  }
-
-  clean() {
-    this.refs.formUser.reset();
   }
 }
 module.exports = CreateUser;
